@@ -3,27 +3,24 @@ version: '3.8'
 services:
   db:
     image: postgres:15
-    container_name: db
     environment:
       POSTGRES_DB: demo
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    volumes:
-      - db_data:/var/lib/postgresql/data
+    # volumes:  # если нельзя — закомментировать
+    #   - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
   redis:
     image: redis:7-alpine
-    container_name: redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
+    # volumes:
+    #   - redis_data:/data
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -35,7 +32,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: backend
     ports:
       - "8000:8000"
     depends_on:
@@ -65,7 +61,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: celery
     depends_on:
       - db
       - redis
@@ -90,9 +85,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: celery-beat
-    volumes:
-      - celerybeat_data:/app/celerybeat
+    # volumes:
+    #   - celerybeat_data:/app/celerybeat
     depends_on:
       - db
       - redis
@@ -107,13 +101,12 @@ services:
       - CELERY_BROKER_URL=amqp://user:password@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=rpc://
     user: celery
-    command: celery -A backend beat -l info -s /app/celerybeat/celerybeat-schedule
+    command: celery -A backend beat -l info
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: frontend
     ports:
       - "80:80"
     depends_on:
@@ -121,7 +114,6 @@ services:
 
   frontend-dev:
     image: node:18
-    container_name: frontend-dev
     working_dir: /app
     ports:
       - "5173:5173"
@@ -130,8 +122,3 @@ services:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
-
-volumes:
-  db_data:
-  redis_data:
-  celerybeat_data:
