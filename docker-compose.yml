@@ -11,7 +11,7 @@ services:
       - DB_NAME=demo
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - DB_HOST=localhost  # если БД нет, можно так, иначе правильный адрес
+      - DB_HOST=localhost
       - DB_PORT=5432
       - MAILGUN_API_KEY=
       - MAILGUN_DOMAIN=
